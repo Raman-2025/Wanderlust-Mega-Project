@@ -1,0 +1,32 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-nginx
+  namespace: wanderlust
+  annotations:
+    # Prevents NGINX from forcing HTTPS since you don't have an SSL certificate yet
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    
+    # Optional but recommended: Adds CORS headers at the NGINX level
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+spec:
+  ingressClassName: nginx
+  rules:
+  - http:
+      paths:
+      # /api MUST come first!
+      - pathType: Prefix
+        path: /api
+        backend:               
+          service:
+            name: backend-svc
+            port:
+              number: 8080
+      - pathType: Prefix
+        path: /
+        backend:               
+          service:
+            name: frontend-svc
+            port:
+              number: 5173

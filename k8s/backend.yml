@@ -30,7 +30,7 @@ spec:
         - name: REDIS_URL
           value: "redis://redis-svc.wanderlust.svc.cluster.local:6379" 
         - name: FRONTEND_URL
-          value: "http://" 
+          value: "http://frontend-svc.wanderlust.svc.cluster.local:5173"   ##### changes
         - name: ACCESS_COOKIE_MAXAGE
           value: "120000" 
         - name: ACCESS_TOKEN_EXPIRES_IN
