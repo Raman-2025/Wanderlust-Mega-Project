@@ -30,7 +30,7 @@ spec:
         - name: REDIS_URL
           value: "redis://redis-svc.wanderlust.svc.cluster.local:6379" 
         - name: FRONTEND_URL
-          value: "http://frontend-svc.wanderlust.svc.cluster.local:5173"   ##### changes
+          value: "http:// "     # "http://a83b49c...elb.us-east-1.amazonaws.com" when used nginx-ingress-controller 
         - name: ACCESS_COOKIE_MAXAGE
           value: "120000" 
         - name: ACCESS_TOKEN_EXPIRES_IN
@@ -59,6 +59,7 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 8080
-  type: LoadBalancer
+  type: ClusterIP  
+  
 
 

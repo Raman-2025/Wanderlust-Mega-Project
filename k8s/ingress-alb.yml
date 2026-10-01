@@ -1,21 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ingress-nginx
+  name: ingress-alb
   namespace: wanderlust
   annotations:
-    # Prevents NGINX from forcing HTTPS since you don't have an SSL certificate yet
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    
-    # Optional but recommended: Adds CORS headers at the NGINX level
-    nginx.ingress.kubernetes.io/enable-cors: "true"
-    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    # Tells AWS to create a public ALB
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    # Tells ALB to route directly to Pod IPs (Requires ClusterIP services)
+    alb.ingress.kubernetes.io/target-type: ip
+    # Optional: Automatically listens on port 80 
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
-  ingressClassName: nginx
+  ingressClassName: alb
   rules:
   - http:
       paths:
-      # /api MUST come first!
+      # ALB will pass exactly "/api/posts" to the backend, which perfectly matches your server.js!
       - pathType: Prefix
         path: /api
         backend:               
@@ -23,6 +23,8 @@ spec:
             name: backend-svc
             port:
               number: 8080
+
+      # ALB will pass "/" and everything else to the React frontend        
       - pathType: Prefix
         path: /
         backend:               
