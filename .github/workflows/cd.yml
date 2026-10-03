@@ -19,12 +19,19 @@ jobs:
     - name: configure aws credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        role-to-assume: arn:aws:iam::945714973951:role/github-action-role
         aws-region: ${{ vars.AWS_REGION }}
 
+    - name: Verify Identity 
+      run: |
+          aws sts get-caller-identity    
+
     - name: authentication
-      run: aws eks update-kubeconfig --name eks-cluster-terra --region ${{ vars.AWS_REGION }}     
+      run: aws eks update-kubeconfig \
+              --name eks-cluster-terra \
+              --region ${{ vars.AWS_REGION }}     
 
 
     - name: instructions for frontend deployment
@@ -32,7 +39,9 @@ jobs:
         echo "Deploying the latest images to the Kubernetes cluster..."
     
         echo "Updating frontend deployment..."
-        kubectl set image deployment/frontend-deployment frontend=${{ vars.ECR_URL }}/wanderlust-frontend:latest -n wanderlust
+        kubectl set image deployment/frontend-deployment \
+          frontend=${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.event.workflow_run.head_sha }} \
+          -n wanderlust
 
         echo "restarting frontend deployment..."
         kubectl rollout restart deployment/frontend-deployment -n wanderlust
@@ -45,7 +54,9 @@ jobs:
         echo "Deploying the latest images to the Kubernetes cluster..."
     
         echo "Updating backend deployment..."
-        kubectl set image deployment/backend-deployment backend=${{ vars.ECR_URL }}/wanderlust-backend:latest -n wanderlust
+        kubectl set image deployment/backend-deployment \
+          backend=${{ vars.ECR_URL }}/wanderlust-backend:{{ github.event.workflow_run.head_sha }} \
+          -n wanderlust
 
         echo "restarting backend deployment..."
         kubectl rollout restart deployment/backend-deployment -n wanderlust

@@ -5,6 +5,10 @@ on:
     branches: 
       - cicd
 
+permissions:
+  contents: read
+  id-token: write      
+
 jobs:
     build-and-push:
       runs-on: ubuntu-latest
@@ -16,9 +20,14 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::945714973951:role/github-action-role
           aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verify Identity 
+        run: |
+          aws sts get-caller-identity       
 
       - name: login to ecr
         id: login-ecr
@@ -28,12 +37,12 @@ jobs:
         run:  |
           echo "backend image to ECR..."
           cd backend
-          docker build -t ${{ vars.ECR_URL }}/wanderlust-backend:latest .
-          docker push ${{ vars.ECR_URL }}/wanderlust-backend:latest    
+          docker build -t ${{ vars.ECR_URL }}/wanderlust-backend:{{ github.sha }} .
+          docker push ${{ vars.ECR_URL }}/wanderlust-backend:{{ github.sha }}    
 
       - name: build and push frontend image
         run:  |
           echo "frontend image to ECR..."
           cd frontend
-          docker build -t ${{ vars.ECR_URL }}/wanderlust-frontend:latest .
-          docker push ${{ vars.ECR_URL }}/wanderlust-frontend:latest                                                                      
+          docker build -t ${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.sha }} .
+          docker push ${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.sha }}                                                                      
