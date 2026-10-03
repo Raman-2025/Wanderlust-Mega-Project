@@ -1,4 +1,4 @@
-name: backend image build and push to ecr
+name: image build and push to ecr
 
 on:
   push:
@@ -24,10 +24,16 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: build
+      - name: build and push backend image
         run:  |
+          echo "backend image to ECR..."
           cd backend
-          docker build -t ${{ vars.ECR_URL }}/wanderlust/backend:latest .
+          docker build -t ${{ vars.ECR_URL }}/wanderlust-backend:latest .
+          docker push ${{ vars.ECR_URL }}/wanderlust-backend:latest    
 
-      - name: push
-        run:  docker push ${{ vars.ECR_URL }}/wanderlust/backend:latest                                
+      - name: build and push frontend image
+        run:  |
+          echo "frontend image to ECR..."
+          cd frontend
+          docker build -t ${{ vars.ECR_URL }}/wanderlust-frontend:latest .
+          docker push ${{ vars.ECR_URL }}/wanderlust-frontend:latest                                                                      
