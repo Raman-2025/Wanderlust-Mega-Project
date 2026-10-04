@@ -20,9 +20,7 @@ jobs:
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          #aws-access-key-id: {{ secrets.AWS_ACCESS_KEY_ID }}
-          #aws-secret-access-key: {{ secrets.AWS_SECRET_ACCESS_KEY }}
-          role-to-assume: arn:aws:iam::945714973951:role/GitHubActionsOIDCRole-eks-cluster-terra
+          role-to-assume: arn:aws:iam::945714973951:role/GitHub-Actions-OIDC-Role
           aws-region: ${{ vars.AWS_REGION }}
 
       - name: Verify Identity 
@@ -34,15 +32,23 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: build and push backend image
+        env: 
+          ECR_URL: ${{ steps.login-ecr.outputs.registry }}
+          IMG_TAG: ${{ github.sha }}
+          REPOSITORY: wanderlust-backend
         run:  |
           echo "backend image to ECR..."
           cd backend
-          docker build -t ${{ vars.ECR_URL }}/wanderlust-backend:{{ github.sha }} .
-          docker push ${{ vars.ECR_URL }}/wanderlust-backend:{{ github.sha }}    
+          docker build -t $ECR_URL/$REPOSITORY:$IMG_TAG .
+          docker push $ECR_URL/$REPOSITORY:$IMG_TAG    
 
       - name: build and push frontend image
+        env: 
+          ECR_URL: ${{ steps.login-ecr.outputs.registry }}
+          IMG_TAG: ${{ github.sha }}
+          REPOSITORY: wanderlust-frontend
         run:  |
           echo "frontend image to ECR..."
           cd frontend
-          docker build -t ${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.sha }} .
-          docker push ${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.sha }}                                                                      
+          docker build -t $ECR_URL/$REPOSITORY:$IMG_TAG .
+          docker push $ECR_URL/$REPOSITORY:$IMG_TAG

@@ -4,7 +4,12 @@ on:
   workflow_run:
     workflows: ["image build and push to ecr"]
     types: [completed]
-    branches: [cicd]
+    branches: ['cicd']
+
+permissions:
+  contents: read
+  id-token: write      
+
 
 jobs:
   deploy:
@@ -21,7 +26,7 @@ jobs:
       with:
         #aws-access-key-id: {{ secrets.AWS_ACCESS_KEY_ID }}
         #aws-secret-access-key: {{ secrets.AWS_SECRET_ACCESS_KEY }}
-        role-to-assume: arn:aws:iam::945714973951:role/GitHubActionsOIDCRole-eks-cluster-terra
+        role-to-assume: arn:aws:iam::945714973951:role/GitHub-Actions-OIDC-Role
         aws-region: ${{ vars.AWS_REGION }}
 
     - name: Verify Identity 
@@ -40,7 +45,7 @@ jobs:
     
         echo "Updating frontend deployment..."
         kubectl set image deployment/frontend-deployment \
-          frontend=${{ vars.ECR_URL }}/wanderlust-frontend:{{ github.event.workflow_run.head_sha }} \
+          frontend=${{ vars.ECR_URL }}/wanderlust-frontend:${{ github.event.workflow_run.head_sha }} \
           -n wanderlust
 
         echo "restarting frontend deployment..."
@@ -55,7 +60,7 @@ jobs:
     
         echo "Updating backend deployment..."
         kubectl set image deployment/backend-deployment \
-          backend=${{ vars.ECR_URL }}/wanderlust-backend:{{ github.event.workflow_run.head_sha }} \
+          backend=${{ vars.ECR_URL }}/wanderlust-backend:${{ github.event.workflow_run.head_sha }} \
           -n wanderlust
 
         echo "restarting backend deployment..."
