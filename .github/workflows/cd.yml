@@ -32,9 +32,7 @@ jobs:
           aws sts get-caller-identity    
 
     - name: authentication
-      run: aws eks update-kubeconfig \
-            --name eks-cluster-terra \
-            --region ${{ vars.AWS_REGION }}     
+      run: aws eks update-kubeconfig --name eks-cluster-terra --region ${{ vars.AWS_REGION }}     
 
 
     - name: instructions for frontend deployment
