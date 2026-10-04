@@ -38,21 +38,21 @@ jobs:
       - name: build and push backend image
         env: 
           ECR_URL: ${{ steps.login-ecr.outputs.registry }}
-          IMG_TAG: ${{ github.sha }}
+          BACKEND_IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: wanderlust-backend
         run:  |
           echo "backend image to ECR..."
           cd backend
-          docker build -t $ECR_URL/$REPOSITORY:$IMG_TAG .
-          docker push $ECR_URL/$REPOSITORY:$IMG_TAG    
+          docker build -t $ECR_URL/$REPOSITORY:$BACKEND_IMAGE_TAG .
+          docker push $ECR_URL/$REPOSITORY:$BACKEND_IMAGE_TAG    
 
       - name: build and push frontend image
         env: 
           ECR_URL: ${{ steps.login-ecr.outputs.registry }}
-          IMG_TAG: ${{ github.sha }}
+          FRONTEND_IMAGE_TAG: ${{ github.sha }}
           REPOSITORY: wanderlust-frontend
         run:  |
           echo "frontend image to ECR..."
           cd frontend
-          docker build -t $ECR_URL/$REPOSITORY:$IMG_TAG .
-          docker push $ECR_URL/$REPOSITORY:$IMG_TAG
+          docker build -t $ECR_URL/$REPOSITORY:$FRONTEND_IMAGE_TAG .
+          docker push $ECR_URL/$REPOSITORY:$FRONTEND_IMAGE_TAG
