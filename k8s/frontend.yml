@@ -19,14 +19,15 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: raman20260/wanderlust-frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: 945714973951.dkr.ecr.us-east-1.amazonaws.com/wanderlust-frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 5173
 
         env:
         - name: VITE_API_PATH
           value: "" 
+        
 
 ---
 apiVersion: v1
