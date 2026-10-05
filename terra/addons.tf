@@ -37,8 +37,6 @@ resource "aws_eks_addon" "eks-pod-identity-agent" {
 
 
 
-
-
 #### Dedicated IAM Role for the EBS CSI Pod ####
 resource "aws_iam_role" "ebs_csi_pod_role" {
   name = "ebs-csi-pod-role-${var.cluster_name}"
@@ -77,9 +75,7 @@ resource "aws_eks_pod_identity_association" "ebs_csi_assoc" {
 
 
 
-
-
-
+#### Dedicated IAM Role for the APPLICATION LOAD BALANCER Pod ####
 resource "aws_iam_policy" "alb_controller_policy" {
   name   = "AWSLoadBalancerControllerIAMPolicy-${var.cluster_name}"
   policy = file("${path.module}/iam_policy.json")
