@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: wanderlust
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      name: backend-pod
+      labels:
+        app: backend
+
+    spec:
+      containers:
+      - name: backend
+        image: 945714973951.dkr.ecr.us-east-1.amazonaws.com/wanderlust-backend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+
+        env:
+        - name: MONGODB_URI
+          value: "mongodb://admin:secret@mongo-svc.wanderlust.svc.cluster.local:27017/wanderlust?authSource=admin" 
+        - name: REDIS_URL
+          value: "redis://redis-svc.wanderlust.svc.cluster.local:6379" 
+        - name: FRONTEND_URL
+          value: "http:// "     # "http://a83b49c...elb.us-east-1.amazonaws.com" when used nginx-ingress-controller 
+        - name: ACCESS_COOKIE_MAXAGE
+          value: "120000" 
+        - name: ACCESS_TOKEN_EXPIRES_IN
+          value: "120s" 
+        - name: REFRESH_COOKIE_MAXAGE
+          value: "120000" 
+        - name: REFRESH_TOKEN_EXPIRES_IN
+          value: "120s" 
+        - name: JWT_SECRET
+          value: "70dd8b38486eee723ce2505f6db06f1ee503fde5eb06fc04687191a0ed665f3f98776902d2c89f6b993b1c579a87fedaf584c693a106f7cbf16e8b4e67e9d6df" 
+        - name:  NODE_ENV
+          value: Development 
+
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: wanderlust
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+  type: ClusterIP  
+  
+
+

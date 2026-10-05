@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: wanderlust
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      name: frontend-pod
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+      - name: frontend
+        image: 945714973951.dkr.ecr.us-east-1.amazonaws.com/wanderlust-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5173
+
+        env:
+        - name: VITE_API_PATH
+          value: "" 
+        
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-svc
+  namespace: wanderlust
+spec:
+  selector:
+    app: frontend
+  ports:
+  - protocol: TCP
+    port: 5173
+    targetPort: 5173
+  type: ClusterIP  
+  
+
+

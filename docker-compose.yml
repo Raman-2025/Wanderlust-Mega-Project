@@ -1,0 +1,58 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongo-service
+    ports:
+    - "27017:27017"
+    networks:
+    - app-nw
+    volumes:
+    - mongo-data:/data/db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin 
+      - MONGO_INITDB_ROOT_PASSWORD=secret 
+      - MONGO_INITDB_DATABASE=wanderlust 
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-service
+    ports:
+    - "6379:6379"
+    networks:
+    - app-nw
+    depends_on:
+    - mongodb
+    restart: always
+
+
+  backend:
+    image: raman20260/wanderlust-backend:latest
+    container_name: backend
+    ports:
+    - "8080:8080"
+    networks:
+    - app-nw
+    depends_on:
+    - mongodb
+    env_file:
+      ./backend/.env.docker
+
+  frontend:
+    image: raman20260/wanderlust-frontend:latest
+    container_name: frontend
+    ports:  
+    - "5173:5173"
+    networks:
+    - app-nw
+    depends_on:
+    - backend
+    environment:
+    - VITE_API_PATH=http://3.94.38.126:8080
+
+networks:
+  app-nw:
+
+volumes:
+  mongo-data:    

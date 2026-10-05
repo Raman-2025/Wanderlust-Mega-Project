@@ -1,0 +1,74 @@
+# =========================
+# Node.js / Frontend & Backend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build outputs (React/Vite)
+dist/
+dist-ssr/
+build/
+*.local
+
+# =========================
+# Secrets & Environment Variables (CRITICAL)
+# =========================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+kubeconfig
+kubeconfig_*
+
+# =========================
+# Terraform (CRITICAL)
+# =========================
+# Ignore local terraform state files (these contain raw AWS secrets)
+*.tfstate
+*.tfstate.backup
+
+# Ignore .terraform directory (downloaded providers and modules)
+.terraform/
+
+# Ignore variables files containing sensitive AWS credentials or keys
+*.tfvars
+*.tfvars.json
+
+# Ignore override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore Terraform crash logs
+crash.log
+crash.*.log
+
+# =========================
+# OS & Editor Files
+# =========================
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Ignore the local hidden .terraform directory anywhere in the project
+**/.terraform/*
+
+# Ignore state files (which contain sensitive data and plain-text secrets)
+*.tfstate
+*.tfstate.*
+
+# Ignore variable files containing secrets
+*.tfvars
+*.tfvars.json
+
+

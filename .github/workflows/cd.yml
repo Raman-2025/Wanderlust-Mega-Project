@@ -1,0 +1,73 @@
+name: cd
+
+on:
+  workflow_run:
+    workflows: ["image build and push to ecr"]
+    types: [completed]
+    branches: ['cicd']
+
+permissions:
+  contents: read
+  id-token: write      
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: configure aws credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::945714973951:role/GitHub-Actions-OIDC-Role
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Verify Identity 
+      run: |
+          aws sts get-caller-identity    
+
+    - name: authentication
+      run: aws eks update-kubeconfig --name eks-cluster-terra --region ${{ vars.AWS_REGION }}     
+
+    - name: instructions for frontend deployment
+      env:
+        ECR_URL: ${{ vars.ECR_URL }}
+        FRONTEND_IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+        REPOSITORY: wanderlust-frontend
+      run: |
+        echo "Deploying the latest images to the Kubernetes cluster..."
+    
+        echo "Updating frontend deployment..."
+        kubectl set image deployment/frontend-deployment \
+          frontend=$ECR_URL/$REPOSITORY:$FRONTEND_IMAGE_TAG \
+          -n wanderlust
+
+        echo "restarting frontend deployment..."
+        kubectl rollout restart deployment/frontend-deployment -n wanderlust
+
+        echo "status of frontend deployment..."
+        kubectl rollout status deployment/frontend-deployment -n wanderlust
+
+    - name: insrtuctions for backend deployment
+      env:
+        ECR_URL: ${{ vars.ECR_URL }}
+        BACKEND_IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
+        REPOSITORY: wanderlust-backend
+      run: |
+        echo "Deploying the latest images to the Kubernetes cluster..."
+    
+        echo "Updating backend deployment..."
+        kubectl set image deployment/backend-deployment \
+          backend=$ECR_URL/$REPOSITORY:$BACKEND_IMAGE_TAG \
+          -n wanderlust
+
+        echo "restarting backend deployment..."
+        kubectl rollout restart deployment/backend-deployment -n wanderlust
+
+        echo "status of backend deployment..."
+        kubectl rollout status deployment/backend-deployment -n wanderlust      
