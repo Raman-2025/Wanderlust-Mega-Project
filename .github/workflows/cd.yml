@@ -34,11 +34,6 @@ jobs:
     - name: authentication
       run: aws eks update-kubeconfig --name eks-cluster-terra --region ${{ vars.AWS_REGION }}     
 
-    - name: Apply Kubernetes Manifests
-      run: |
-        echo "Applying all Services, Ingress, and Deployments..."
-        kubectl apply -f k8s/
-
     - name: instructions for frontend deployment
       env:
         ECR_URL: ${{ vars.ECR_URL }}
