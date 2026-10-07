@@ -17,19 +17,11 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
 
-      - name: DEBUG - Print Exact GitHub Context
-        run: |
-          echo "The exact repository string AWS expects is: repo:${{ github.repository }}:*"      
-
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::945714973951:role/GitHub-Actions-OIDC-Role
           aws-region: ${{ vars.AWS_REGION }}
-
-      - name: Verify Identity 
-        run: |
-          aws sts get-caller-identity       
 
       - name: login to ecr
         id: login-ecr
