@@ -3,7 +3,7 @@ name: image build and push to ecr
 on:
   push:
     branches: 
-      - cicd
+      - main
 
 permissions:
   contents: read

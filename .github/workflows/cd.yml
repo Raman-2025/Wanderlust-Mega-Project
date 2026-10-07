@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["image build and push to ecr"]
     types: [completed]
-    branches: ['cicd']
+    branches: ['main']
 
 permissions:
   contents: read
